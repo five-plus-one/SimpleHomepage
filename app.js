@@ -47,6 +47,7 @@ const stressItems = (kind) => Array.from({ length: 14 }, (_, index) => ({
   icon: kind === "项目" ? "spark" : "paper",
 }));
 let renderedCollections = {};
+let overviewCounts = {};
 
 function resourceList(items) {
   return items.map(({ label, description, url, icon: iconName }) => `
@@ -63,6 +64,12 @@ function resourceGroup(title, items, key, limit) {
   return `<div class="content-group"><h2>${title}${stressMode ? " · 压力测试" : ""}</h2>${resourceList(preview)}${remaining > 0 ? `<button class="group-more" data-collection="${key}">查看全部 <span>${items.length}</span>${icon("arrow")}</button>` : ""}</div>`;
 }
 
+function overviewMarkup() {
+  const sites = renderedCollections.sites || [];
+  const projects = renderedCollections.projects || [];
+  return `${sites.length ? resourceGroup("站点", sites, "sites", overviewCounts.sites || 0) : ""}${projects.length ? resourceGroup("项目", projects, "projects", overviewCounts.projects || 0) : ""}`;
+}
+
 function socialLink(item) {
   return `<a class="social" href="${item.url}"${external(item.url)} aria-label="${safe(item.label)}">
     <span>${icon(item.icon)}</span><em>${safe(item.label)}</em>
@@ -72,12 +79,8 @@ function socialLink(item) {
 function render() {
   const sites = stressMode ? [...(config.sites || []), ...stressItems("站点")] : (config.sites || []);
   const projects = stressMode ? [...(config.projects || []), ...stressItems("项目")] : (config.projects || []);
-  // 超量分组使用更小的概览预算，避免任意视口比例下与页脚互相挤压。
-  const isNarrow = window.matchMedia("(max-width: 720px)").matches;
-  const previewLimitFor = (items) => items.length > 4 ? 2 : (isNarrow ? 3 : 4);
-  const sitesPreviewLimit = previewLimitFor(sites);
-  const projectsPreviewLimit = previewLimitFor(projects);
   renderedCollections = { sites: sites || [], projects: projects || [] };
+  overviewCounts = { sites: 0, projects: 0 };
   const compliance = [config.compliance?.icp, config.compliance?.publicSecurity].filter((item) => item?.label);
   const complianceHtml = compliance.length ? `<div class="compliance">${compliance.map((item, index) => `<a href="${item.url}" target="_blank" rel="noreferrer">${index === 1 ? icon("shield") : ""}${safe(item.label)}</a>`).join("")}</div>` : "";
   const poweredBy = config.poweredBy?.show !== false && config.poweredBy?.url ? `<a class="repository" href="${config.poweredBy.url}" target="_blank" rel="noreferrer">${icon("github")}由 SimpleHomepage 驱动</a>` : "";
@@ -98,10 +101,7 @@ function render() {
           <section class="social-section"><p>联系</p><div class="social-wrap"><nav class="socials" aria-label="社交账号">${config.socials.map(socialLink).join("")}</nav><button id="more-button" class="more-button" aria-expanded="false" hidden>更多 <span></span></button><div id="more-popover" class="more-popover" aria-hidden="true"></div></div></section>
         </section>
         <section class="content" aria-label="站点与项目">
-          <div id="content-overview" class="content-view content-overview">
-            ${sites?.length ? resourceGroup("站点", sites, "sites", sitesPreviewLimit) : ""}
-            ${projects?.length ? resourceGroup("项目", projects, "projects", projectsPreviewLimit) : ""}
-          </div>
+          <div id="content-overview" class="content-view content-overview"></div>
           <div id="content-detail" class="content-view content-detail" aria-hidden="true">
             <div class="detail-heading"><button id="collection-back" class="collection-back">${icon("back")}<span>返回</span></button><h2 id="collection-title"></h2></div>
             <div id="collection-list" class="collection-list"></div>
@@ -202,6 +202,40 @@ function setupSocialOverflow() {
   update();
 }
 setupSocialOverflow();
+function setupOverviewCapacity() {
+  const content = document.querySelector(".content");
+  const overview = document.querySelector("#content-overview");
+  const keys = ["sites", "projects"].filter((key) => renderedCollections[key].length);
+  let frame;
+  const draw = () => { overview.innerHTML = overviewMarkup(); };
+  const fit = () => {
+    overviewCounts = Object.fromEntries(keys.map((key) => [key, 0]));
+    draw();
+    let cursor = 0;
+    let canFit = true;
+    while (canFit && keys.some((key) => overviewCounts[key] < renderedCollections[key].length)) {
+      const key = keys[cursor % keys.length];
+      cursor++;
+      if (overviewCounts[key] >= renderedCollections[key].length) continue;
+      overviewCounts[key]++;
+      draw();
+      if (overview.scrollHeight > content.clientHeight) {
+        overviewCounts[key]--;
+        draw();
+        canFit = false;
+      }
+    }
+  };
+  const scheduleFit = () => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(fit);
+  };
+  new ResizeObserver(scheduleFit).observe(content);
+  window.addEventListener("load", scheduleFit, { once: true });
+  document.fonts?.ready.then(scheduleFit);
+  scheduleFit();
+}
+setupOverviewCapacity();
 function setupCollectionPanel() {
   const content = document.querySelector(".content");
   const overview = document.querySelector("#content-overview");
@@ -214,7 +248,9 @@ function setupCollectionPanel() {
     overview.setAttribute("aria-hidden", "false");
     detail.setAttribute("aria-hidden", "true");
   };
-  document.querySelectorAll("[data-collection]").forEach((button) => button.addEventListener("click", () => {
+  overview.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-collection]");
+    if (!button) return;
     const key = button.dataset.collection;
     title.textContent = key === "sites" ? "全部站点" : "全部项目";
     list.innerHTML = resourceList(renderedCollections[key]);
@@ -223,7 +259,7 @@ function setupCollectionPanel() {
     overview.setAttribute("aria-hidden", "true");
     detail.setAttribute("aria-hidden", "false");
     backButton.focus();
-  }));
+  });
   backButton.addEventListener("click", close);
   document.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
 }
