@@ -29,7 +29,7 @@ const avatarFor = (mode) => {
 
 function resourceList(items) {
   return items.map(({ label, description, url, icon: iconName }) => `
-    <a class="resource" href="${url}"${external(url)}>
+    <a class="resource" href="${url}"${external(url)} title="${safe(label)}${description ? ` — ${safe(description)}` : ""}">
       <span class="resource-icon">${icon(iconName)}</span>
       <span><strong>${safe(label)}</strong><small>${safe(description || "")}</small></span>
       <span class="outbound">${icon("arrow")}</span>
@@ -49,7 +49,7 @@ function render() {
 
   document.documentElement.style.setProperty("--accent-light", config.theme.accent.light);
   document.documentElement.style.setProperty("--accent-dark", config.theme.accent.dark);
-  document.title = config.siteName || config.profile.name;
+  document.title = config.seo?.title || config.siteName || config.profile.name;
   document.querySelector("#app").innerHTML = `
     <section class="page-shell">
       <header><button id="theme-toggle" class="theme-toggle" aria-label="切换颜色模式">${icon("sun")}<span>浅色</span></button></header>
@@ -59,7 +59,7 @@ function render() {
           <p class="eyebrow">${safe(config.profile.handle)}</p>
           <h1>${safe(config.profile.name)}</h1>
           <p class="introduction">${safe(config.profile.introduction)}</p>
-          <p class="quote"><span aria-hidden="true">“</span><span id="typed-quote"></span><i aria-hidden="true"></i></p>
+          <p class="quote"><span class="quote-line" aria-hidden="true"></span><span id="typed-quote"></span><i aria-hidden="true"></i></p>
           <section class="social-section"><p>联系</p><div class="social-wrap"><nav class="socials" aria-label="社交账号">${config.socials.map(socialLink).join("")}</nav><button id="more-button" class="more-button" aria-expanded="false" hidden>更多 <span></span></button><div id="more-popover" class="more-popover" aria-hidden="true"></div></div></section>
         </section>
         <section class="content" aria-label="站点与项目">

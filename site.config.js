@@ -5,6 +5,13 @@
 export const siteConfig = {
   // 站点标题可自由定义；不填写时使用 profile.name。
   siteName: "五加一",
+  seo: {
+    title: "五加一｜个人主页",
+    description: "五加一的个人主页：编程、技术探索与作品链接。",
+    keywords: ["五加一", "five-plus-one", "个人主页", "编程", "技术探索"],
+    siteUrl: "https://five-plus-one.com/",
+    image: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png",
+  },
   profile: {
     name: "五加一",
     handle: "five-plus-one",
