@@ -5,8 +5,8 @@ const icons = {
   sun: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>',
   moon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z"/></svg>',
   github: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 19c-4 1.2-4-2-5.5-2.5M15.5 21v-3.1a2.7 2.7 0 0 0-.8-2.1c2.7-.3 5.5-1.3 5.5-6A4.6 4.6 0 0 0 19 6.6 4.3 4.3 0 0 0 18.9 3s-1-.3-3.4 1.3a11.7 11.7 0 0 0-6.1 0C7 2.7 6 3 6 3a4.3 4.3 0 0 0-.1 3.6 4.6 4.6 0 0 0-1.2 3.2c0 4.7 2.8 5.7 5.5 6a2.7 2.7 0 0 0-.8 2.1V21"/></svg>',
-  wechat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.8 9.6c0-3.1-3.2-5.6-7.2-5.6S2.4 6.5 2.4 9.6s3.2 5.6 7.2 5.6c.7 0 1.4-.1 2-.3l2.5 1.4-.6-2.1c.8-.7 1.4-1.6 1.7-2.6"/><path d="M13.4 12.1c0 2.5 2.7 4.5 6 4.5.5 0 1-.1 1.5-.2l1.7 1-.4-1.5c.6-.6.9-1.3.9-2.1 0-2.5-2.7-4.5-6-4.5-.7 0-1.3.1-1.9.3"/><path d="M7 9.3h.01M11.8 9.3h.01M17 12.9h.01M20.3 12.9h.01"/></svg>',
-  qq: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 17.5c-1.4.1-2.8.7-3.8 1.7 1.7.6 3.5.8 5.3.5M15.5 17.5c1.4.1 2.8.7 3.8 1.7-1.7.6-3.5.8-5.3.5M8 14.5c-1-1.4-1.4-3.1-1.2-4.8C7 5.8 9.2 3 12 3s5 2.8 5.2 6.7c.2 1.7-.2 3.4-1.2 4.8l.6 3.3c-1.5.8-3 .9-4.6.2-1.6.7-3.1.6-4.6-.2l.6-3.3Z"/><path d="M9.5 10.4h.01M14.5 10.4h.01"/></svg>',
+  wechat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.2C10.2 2.4 4 4.2 4 8.7c0 2.4 2.1 4.3 4.8 4.8l-.6 2.1 2.8-1.6c.8.2 1.7.3 2.5.2"/><path d="M12.4 12.1c0-3.2 3-5.6 6.3-5.1 2.2.3 3.9 1.8 3.9 4 0 3-3 5.1-6 4.3l-2.5 1.4.5-1.9c-1.4-.8-2.2-1.7-2.2-2.8Z"/><path d="M8.2 8.7h.01M11.6 8.7h.01M16.7 11.5h.01M19.5 11.5h.01"/></svg>',
+  qq: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="10" r="5.5"/><path d="M14.9 14.1 20 20M11 7.5v5M8.5 10h5"/></svg>',
   mail: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>',
   screen: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="4"/><path d="M8 3v3M16 3v3M9 12h.01M15 12h.01"/></svg>',
   link: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13.8a4 4 0 0 0 5.7.1l2.1-2.1a4 4 0 0 0-5.7-5.7l-1.2 1.2M14 10.2a4 4 0 0 0-5.7-.1l-2.1 2.1a4 4 0 0 0 5.7 5.7l1.2-1.2"/></svg>',
@@ -19,9 +19,15 @@ const icons = {
   shield: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5c0 4.3-2.7 7.8-7 10-4.3-2.2-7-5.7-7-10V6Z"/><path d="m8.5 12 2.2 2.2 4.8-4.8"/></svg>',
 };
 
-const icon = (name) => icons[name] || icons.link;
 const external = (url) => /^https?:/i.test(url) ? ' target="_blank" rel="noreferrer"' : "";
 const safe = (text) => String(text).replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char]);
+const icon = (name) => {
+  if (typeof name === "object" && name?.paths) {
+    const viewBox = safe(name.viewBox || "0 0 24 24");
+    return `<svg viewBox="${viewBox}" aria-hidden="true">${name.paths.map((path) => `<path d="${safe(path)}"/>`).join("")}</svg>`;
+  }
+  return icons[name] || icons.link;
+};
 const avatarFor = (mode) => {
   const avatar = config.profile.avatar;
   return typeof avatar === "string" ? avatar : avatar?.[mode] || avatar?.light || avatar?.dark || "";

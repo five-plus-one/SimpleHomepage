@@ -27,8 +27,8 @@ export const siteConfig = {
     "The world endures, and ideals never fade.",
   ],
   sites: [
-    { label: "博客", description: "blog.five-plus-one.com", url: "https://blog.five-plus-one.com", icon: "paper" },
-    { label: "五加一的网盘", description: "pan.five-plus-one.com", url: "https://pan.five-plus-one.com", icon: "archive" },
+    { label: "博客", description: "五加一的星空", url: "https://blog.five-plus-one.com", icon: "paper" },
+    { label: "五加一的网盘", description: "资源分享", url: "https://pan.five-plus-one.com", icon: "archive" },
     { label: "南通中学 2215", description: "班级站点", url: "https://ntzx2215.five-plus-one.com", icon: "people" },
     { label: "5PLUS1 SERVER", description: "Minecraft 服务器", url: "https://mc.five-plus-one.com", icon: "cube" },
   ],
