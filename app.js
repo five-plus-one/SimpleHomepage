@@ -29,11 +29,17 @@ const icon = (name) => {
   }
   return icons[name] || icons.link;
 };
-const avatarFor = (mode) => {
-  const avatar = config.profile.avatar;
-  return typeof avatar === "string" ? avatar : avatar?.[mode] || avatar?.light || avatar?.dark || "";
+const sourceUrl = (source) => {
+  if (typeof source === "string") return source;
+  if (!source) return "";
+  if (source.url) return source.url;
+  if (source.local?.startsWith("./public/")) return source.local.slice("./public".length);
+  return source.local || "";
 };
-const stressMode = new URLSearchParams(window.location.search).has("stress");
+const themedAsset = (asset, mode) => sourceUrl(typeof asset === "string" ? asset : asset?.[mode] || asset?.light || asset?.dark || asset);
+const avatarFor = (mode) => themedAsset(config.profile.avatar, mode);
+// 压力数据只允许在 Vite 开发服务器中启用，生产构建会固定关闭。
+const stressMode = import.meta.env.DEV && new URLSearchParams(window.location.search).has("stress");
 const stressItems = (kind) => Array.from({ length: 14 }, (_, index) => ({
   label: `${kind} 压力测试条目 ${String(index + 1).padStart(2, "0")}：用于验证极长中英文混合名称不会挤压布局或截断交互区域`,
   description: "this-is-an-intentionally-very-long-description-for-layout-and-rendering-performance-validation.example.com",
@@ -116,6 +122,8 @@ function setupTheme() {
     button.innerHTML = `${icon(resolved === "dark" ? "moon" : "sun")}<span>${resolved === "dark" ? "深色" : "浅色"}</span>`;
     const avatar = document.querySelector(".avatar");
     if (avatar) avatar.src = avatarFor(resolved);
+    const favicon = document.querySelector("link[rel='icon']");
+    if (favicon) favicon.href = themedAsset(config.favicon, resolved);
   };
   apply();
   document.querySelector("#theme-toggle").addEventListener("click", () => {

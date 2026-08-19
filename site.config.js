@@ -12,13 +12,20 @@ export const siteConfig = {
     siteUrl: "https://five-plus-one.com/",
     image: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png",
   },
+  // 浏览器标签页小图标：可使用远程 url 或 public/ 内的 local 文件。
+  favicon: {
+    // light: { local: "./public/favicon.svg" },
+    // dark: { local: "./public/favicon.svg" },
+    light: { local: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png" },
+    dark: { local: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png" },
+  },
   profile: {
     name: "五加一",
     handle: "five-plus-one",
-    // 支持为浅色与深色模式分别提供头像；也兼容旧版的单个 URL 写法。
+    // 支持远程 url 或 public/ 内的 local 文件，并可分别设置浅色与深色头像。
     avatar: {
-      light: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png",
-      dark: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png",
+      light: { url: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png" },
+      dark: { url: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png" },
     },
     introduction: "河海大学计算机科学学生，持续探索编程、技术与有趣的想法。",
   },
@@ -33,9 +40,9 @@ export const siteConfig = {
     { label: "5PLUS1 SERVER", description: "Minecraft 服务器", url: "https://mc.five-plus-one.com", icon: "cube" },
   ],
   projects: [
-    { label: "AI-Marker-Suite", description: "AI 阅卷自动批改助手", url: "https://github.com/five-plus-one/AI-Marker-Suite", icon: "spark" },
-    { label: "HoHai 110", description: "河海大学校庆交互网站", url: "https://github.com/five-plus-one/HoHai110_frontend", icon: "people" },
-    { label: "Cardan", description: "卡尔丹圆运动学可视化", url: "https://github.com/five-plus-one/Cardan", icon: "cube" },
+    { label: "AI-Marker-Suite", description: "AI 阅卷自动批改助手", url: "https://aimarking.five-plus-one.com/", icon: "spark" },
+    { label: "HoHai 110", description: "河海大学校庆交互网站", url: "https://hohai110.five-plus-one.com/", icon: "people" },
+    { label: "Cardan", description: "卡尔丹圆运动学可视化", url: "https://cardan.five-plus-one.com/", icon: "cube" },
   ],
   socials: [
     { label: "GitHub", url: "https://r-l.ink/github", icon: "github", primary: true },

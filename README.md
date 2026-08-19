@@ -24,6 +24,25 @@ npm run build
 - `compliance`：ICP备案及公网安备案均为可选；`label` 为空时不显示。
 - `poweredBy`：可隐藏页脚的项目链接，但建议保留署名以支持项目。
 
+### 本地头像与浏览器图标
+
+将图片放在 `public/` 目录下，例如 `public/images/avatar-light.png`、`public/favicon.png`。它们会在构建时被复制到 `dist/`。配置使用相对项目根目录的 `./public/` 路径：
+
+```js
+profile: {
+  avatar: {
+    light: { local: "./public/images/avatar-light.png" },
+    dark: { local: "./public/images/avatar-dark.png" },
+  }
+},
+favicon: {
+  light: { local: "./public/favicon-light.png" },
+  dark: { local: "./public/favicon-dark.png" },
+}
+```
+
+也可将 `{ local: ... }` 替换为 `{ url: "https://..." }`。浅深色素材相同时，两个字段填写同一路径即可。
+
 项目中所有 UI 图标均为内置的原创单色 SVG 线稿，不需要下载图标库。
 
 ### 自定义平台图标
@@ -45,4 +64,8 @@ npm run build
 
 ## 压力测试
 
-开发模式下访问 `http://localhost:5173/?stress=1`，会临时追加 14 条超长名称的站点和项目，用于检查大量条目、超长文字与列表收纳。主页仅展示每组前 4 项，其余通过“查看全部”进入独立的可滚动列表；该数据不会写入正式配置，也不会出现在正常构建的主页中。
+仅在开发模式下访问 `http://localhost:5173/?stress=1`，会临时追加 14 条超长名称的站点和项目，用于检查大量条目、超长文字与列表收纳。主页仅展示每组前 4 项，其余通过“查看全部”进入独立的可滚动列表。生产构建会强制关闭该模式：部署后的站点即使带上 `?stress=1` 也不会显示测试数据。
+
+## 小高度视口
+
+页面会尽量维持一屏；当 CSS 视口高度不足 700px（包括高 DPI 横屏设备）时，会自动改为自然页面滚动，优先保证内容、返回按钮和备案信息不被裁切或相互覆盖。
