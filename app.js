@@ -208,6 +208,13 @@ function setupOverviewCapacity() {
   const keys = ["sites", "projects"].filter((key) => renderedCollections[key].length);
   let frame;
   const draw = () => { overview.innerHTML = overviewMarkup(); };
+  const isOverflowing = () => {
+    const contentBottom = content.getBoundingClientRect().bottom;
+    const lastGroup = overview.lastElementChild;
+    if (!lastGroup) return false;
+    // 绝对定位视图在部分浏览器中不会把视觉溢出完整计入 scrollHeight，使用实际边界兜底。
+    return overview.scrollHeight > content.clientHeight || lastGroup.getBoundingClientRect().bottom > contentBottom - 3;
+  };
   const fit = () => {
     overviewCounts = Object.fromEntries(keys.map((key) => [key, 0]));
     draw();
@@ -219,7 +226,7 @@ function setupOverviewCapacity() {
       if (overviewCounts[key] >= renderedCollections[key].length) continue;
       overviewCounts[key]++;
       draw();
-      if (overview.scrollHeight > content.clientHeight) {
+      if (isOverflowing()) {
         overviewCounts[key]--;
         draw();
         canFit = false;
