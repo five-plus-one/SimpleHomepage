@@ -22,6 +22,10 @@ const icons = {
 const icon = (name) => icons[name] || icons.link;
 const external = (url) => /^https?:/i.test(url) ? ' target="_blank" rel="noreferrer"' : "";
 const safe = (text) => String(text).replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char]);
+const avatarFor = (mode) => {
+  const avatar = config.profile.avatar;
+  return typeof avatar === "string" ? avatar : avatar?.[mode] || avatar?.light || avatar?.dark || "";
+};
 
 function resourceList(items) {
   return items.map(({ label, description, url, icon: iconName }) => `
@@ -41,17 +45,17 @@ function socialLink(item) {
 function render() {
   const compliance = [config.compliance?.icp, config.compliance?.publicSecurity].filter((item) => item?.label);
   const complianceHtml = compliance.length ? `<div class="compliance">${compliance.map((item, index) => `<a href="${item.url}" target="_blank" rel="noreferrer">${index === 1 ? icon("shield") : ""}${safe(item.label)}</a>`).join("")}</div>` : "";
-  const repository = config.repository ? `<a class="repository" href="${config.repository}" target="_blank" rel="noreferrer">${icon("github")}本项目 GitHub</a>` : "";
+  const poweredBy = config.poweredBy?.show !== false && config.poweredBy?.url ? `<a class="repository" href="${config.poweredBy.url}" target="_blank" rel="noreferrer">${icon("github")}由 SimpleHomepage 驱动</a>` : "";
 
   document.documentElement.style.setProperty("--accent-light", config.theme.accent.light);
   document.documentElement.style.setProperty("--accent-dark", config.theme.accent.dark);
-  document.title = `${config.profile.name} · Simple`;
+  document.title = config.siteName || config.profile.name;
   document.querySelector("#app").innerHTML = `
     <section class="page-shell">
       <header><button id="theme-toggle" class="theme-toggle" aria-label="切换颜色模式">${icon("sun")}<span>浅色</span></button></header>
       <div class="main-grid">
         <section class="identity" aria-label="个人介绍">
-          <div class="avatar-orbit"><img class="avatar" src="${config.profile.avatar}" alt="${safe(config.profile.name)}的头像" /></div>
+          <img class="avatar" src="${avatarFor("light")}" alt="${safe(config.profile.name)}的头像" />
           <p class="eyebrow">${safe(config.profile.handle)}</p>
           <h1>${safe(config.profile.name)}</h1>
           <p class="introduction">${safe(config.profile.introduction)}</p>
@@ -63,7 +67,7 @@ function render() {
           ${config.projects?.length ? `<div class="content-group"><h2>项目</h2>${resourceList(config.projects)}</div>` : ""}
         </section>
       </div>
-      <footer><div class="footer-bottom">${complianceHtml}<span class="footer-meta">${repository}© ${new Date().getFullYear()} ${safe(config.profile.name)}</span></div></footer>
+      <footer><div class="footer-bottom">${complianceHtml}<span class="footer-meta">${poweredBy}© ${new Date().getFullYear()} ${safe(config.profile.name)}</span></div></footer>
     </section>`;
 }
 
@@ -79,6 +83,8 @@ function setupTheme() {
     document.querySelector("meta[name='theme-color']").content = resolved === "dark" ? "#121212" : "#f6f6f4";
     const button = document.querySelector("#theme-toggle");
     button.innerHTML = `${icon(resolved === "dark" ? "moon" : "sun")}<span>${resolved === "dark" ? "深色" : "浅色"}</span>`;
+    const avatar = document.querySelector(".avatar");
+    if (avatar) avatar.src = avatarFor(resolved);
   };
   apply();
   document.querySelector("#theme-toggle").addEventListener("click", () => {
@@ -134,7 +140,11 @@ function setupSocialOverflow() {
     }
     const hiddenItems = links.filter((link) => link.hidden);
     button.querySelector("span").textContent = `+${hiddenItems.length}`;
-    popover.innerHTML = hiddenItems.map((link) => link.outerHTML.replace(" hidden=\"\"", "")).join("");
+    popover.innerHTML = hiddenItems.map((link) => {
+      const clone = link.cloneNode(true);
+      clone.hidden = false;
+      return clone.outerHTML;
+    }).join("");
     if (!hiddenItems.length) button.hidden = true;
   };
   button.addEventListener("click", () => {

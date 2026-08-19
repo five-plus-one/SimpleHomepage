@@ -3,10 +3,16 @@
  * accent 仅支持一组用户主题色，light/dark 分别用于浅色和深色模式。
  */
 export const siteConfig = {
+  // 站点标题可自由定义；不填写时使用 profile.name。
+  siteName: "五加一",
   profile: {
     name: "五加一",
     handle: "five-plus-one",
-    avatar: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png",
+    // 支持为浅色与深色模式分别提供头像；也兼容旧版的单个 URL 写法。
+    avatar: {
+      light: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png",
+      dark: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png",
+    },
     introduction: "河海大学计算机科学学生，持续探索编程、技术与有趣的想法。",
   },
   quotes: [
@@ -35,12 +41,16 @@ export const siteConfig = {
   ],
   theme: {
     accent: { light: "#FD8B07", dark: "#FD8B07" },
-    defaultMode: "system", // system | light | dark
+    defaultMode: "system", // 默认跟随浏览器：system | light | dark
   },
   compliance: {
     // 填写后才会显示；
     icp: { label: "苏ICP备2025155286号-1", url: "https://beian.miit.gov.cn/" },
     publicSecurity: { label: "苏公网安备32060202002665号", url: "http://www.beian.gov.cn/" },
   },
-  repository: "https://github.com/five-plus-one/SimpleHomepage",
+  poweredBy: {
+    // 建议保留署名以支持项目；设为 false 可隐藏。
+    show: true,
+    url: "https://github.com/five-plus-one/SimpleHomepage",
+  },
 };
