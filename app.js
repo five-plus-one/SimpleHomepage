@@ -70,8 +70,8 @@ function socialLink(item) {
 }
 
 function render() {
-  const sites = stressMode ? [...(config.sites || []), ...stressItems("站点")] : config.sites;
-  const projects = stressMode ? [...(config.projects || []), ...stressItems("项目")] : config.projects;
+  const sites = stressMode ? [...(config.sites || []), ...stressItems("站点")] : (config.sites || []);
+  const projects = stressMode ? [...(config.projects || []), ...stressItems("项目")] : (config.projects || []);
   // 两组都超量或窄屏时降低概览预算，避免概览与页脚互相挤压。
   const isNarrow = window.matchMedia("(max-width: 720px)").matches;
   const previewLimit = isNarrow || (sites.length > 4 && projects.length > 4) ? 3 : 4;
