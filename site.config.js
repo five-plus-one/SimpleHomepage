@@ -27,7 +27,7 @@ export const siteConfig = {
       light: { url: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png" },
       dark: { url: "https://img.assets.five-plus-one.com/i/2025/02/06/1738833569469/08EA894CBCAE2A559E6E18CF4B2E700F-removebg-preview.png" },
     },
-    introduction: "河海大学计算机科学学生，持续探索编程、技术与有趣的想法。",
+    introduction: "大二在读计科学生，持续探索编程、技术与有趣的想法。",
   },
   quotes: [
     "世界不死，理想不灭。",
