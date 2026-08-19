@@ -53,7 +53,7 @@ export const siteConfig = {
   compliance: {
     // 填写后才会显示；
     icp: { label: "苏ICP备2025155286号-1", url: "https://beian.miit.gov.cn/" },
-    publicSecurity: { label: "苏公网安备32060202002665号", url: "http://www.beian.gov.cn/" },
+    publicSecurity: { label: "苏公网安备32060202002665号", url: "https://beian.mps.gov.cn/#/query/webSearch?code=32060202002665" },
   },
   poweredBy: {
     // 建议保留署名以支持项目；设为 false 可隐藏。

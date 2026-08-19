@@ -26,6 +26,15 @@ const avatarFor = (mode) => {
   const avatar = config.profile.avatar;
   return typeof avatar === "string" ? avatar : avatar?.[mode] || avatar?.light || avatar?.dark || "";
 };
+const stressMode = new URLSearchParams(window.location.search).has("stress");
+const stressItems = (kind) => Array.from({ length: 14 }, (_, index) => ({
+  label: `${kind} 压力测试条目 ${String(index + 1).padStart(2, "0")}：用于验证极长中英文混合名称不会挤压布局或截断交互区域`,
+  description: "this-is-an-intentionally-very-long-description-for-layout-and-rendering-performance-validation.example.com",
+  url: "https://example.com/",
+  icon: kind === "项目" ? "spark" : "paper",
+}));
+const previewLimit = 4;
+let renderedCollections = {};
 
 function resourceList(items) {
   return items.map(({ label, description, url, icon: iconName }) => `
@@ -36,6 +45,12 @@ function resourceList(items) {
     </a>`).join("");
 }
 
+function resourceGroup(title, items, key) {
+  const preview = items.slice(0, previewLimit);
+  const remaining = items.length - preview.length;
+  return `<div class="content-group"><h2>${title}${stressMode ? " · 压力测试" : ""}</h2>${resourceList(preview)}${remaining > 0 ? `<button class="group-more" data-collection="${key}">查看全部 <span>${items.length}</span>${icon("arrow")}</button>` : ""}</div>`;
+}
+
 function socialLink(item) {
   return `<a class="social" href="${item.url}"${external(item.url)} aria-label="${safe(item.label)}">
     <span>${icon(item.icon)}</span><em>${safe(item.label)}</em>
@@ -43,6 +58,9 @@ function socialLink(item) {
 }
 
 function render() {
+  const sites = stressMode ? [...(config.sites || []), ...stressItems("站点")] : config.sites;
+  const projects = stressMode ? [...(config.projects || []), ...stressItems("项目")] : config.projects;
+  renderedCollections = { sites: sites || [], projects: projects || [] };
   const compliance = [config.compliance?.icp, config.compliance?.publicSecurity].filter((item) => item?.label);
   const complianceHtml = compliance.length ? `<div class="compliance">${compliance.map((item, index) => `<a href="${item.url}" target="_blank" rel="noreferrer">${index === 1 ? icon("shield") : ""}${safe(item.label)}</a>`).join("")}</div>` : "";
   const poweredBy = config.poweredBy?.show !== false && config.poweredBy?.url ? `<a class="repository" href="${config.poweredBy.url}" target="_blank" rel="noreferrer">${icon("github")}由 SimpleHomepage 驱动</a>` : "";
@@ -59,15 +77,21 @@ function render() {
           <p class="eyebrow">${safe(config.profile.handle)}</p>
           <h1>${safe(config.profile.name)}</h1>
           <p class="introduction">${safe(config.profile.introduction)}</p>
-          <p class="quote"><span class="quote-line" aria-hidden="true"></span><span id="typed-quote"></span><i aria-hidden="true"></i></p>
+          <p class="quote"><span id="typed-quote"></span><i aria-hidden="true"></i></p>
           <section class="social-section"><p>联系</p><div class="social-wrap"><nav class="socials" aria-label="社交账号">${config.socials.map(socialLink).join("")}</nav><button id="more-button" class="more-button" aria-expanded="false" hidden>更多 <span></span></button><div id="more-popover" class="more-popover" aria-hidden="true"></div></div></section>
         </section>
         <section class="content" aria-label="站点与项目">
-          ${config.sites?.length ? `<div class="content-group"><h2>站点</h2>${resourceList(config.sites)}</div>` : ""}
-          ${config.projects?.length ? `<div class="content-group"><h2>项目</h2>${resourceList(config.projects)}</div>` : ""}
+          ${sites?.length ? resourceGroup("站点", sites, "sites") : ""}
+          ${projects?.length ? resourceGroup("项目", projects, "projects") : ""}
         </section>
       </div>
       <footer><div class="footer-bottom">${complianceHtml}<span class="footer-meta">${poweredBy}© ${new Date().getFullYear()} ${safe(config.profile.name)}</span></div></footer>
+      <section id="collection-panel" class="collection-panel" aria-hidden="true">
+        <div class="collection-card" role="dialog" aria-modal="true" aria-labelledby="collection-title">
+          <div class="collection-heading"><h2 id="collection-title"></h2><button id="collection-close" class="icon-button" aria-label="关闭">×</button></div>
+          <div id="collection-list" class="collection-list"></div>
+        </div>
+      </section>
     </section>`;
 }
 
@@ -159,3 +183,25 @@ function setupSocialOverflow() {
   update();
 }
 setupSocialOverflow();
+function setupCollectionPanel() {
+  const panel = document.querySelector("#collection-panel");
+  const title = document.querySelector("#collection-title");
+  const list = document.querySelector("#collection-list");
+  const closeButton = document.querySelector("#collection-close");
+  const close = () => {
+    panel.classList.remove("is-open");
+    panel.setAttribute("aria-hidden", "true");
+  };
+  document.querySelectorAll("[data-collection]").forEach((button) => button.addEventListener("click", () => {
+    const key = button.dataset.collection;
+    title.textContent = key === "sites" ? "全部站点" : "全部项目";
+    list.innerHTML = resourceList(renderedCollections[key]);
+    panel.classList.add("is-open");
+    panel.setAttribute("aria-hidden", "false");
+    closeButton.focus();
+  }));
+  closeButton.addEventListener("click", close);
+  panel.addEventListener("click", (event) => { if (event.target === panel) close(); });
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
+}
+setupCollectionPanel();
