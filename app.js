@@ -46,7 +46,6 @@ const stressItems = (kind) => Array.from({ length: 14 }, (_, index) => ({
   url: "https://example.com/",
   icon: kind === "项目" ? "spark" : "paper",
 }));
-const previewLimit = 4;
 let renderedCollections = {};
 
 function resourceList(items) {
@@ -58,8 +57,8 @@ function resourceList(items) {
     </a>`).join("");
 }
 
-function resourceGroup(title, items, key) {
-  const preview = items.slice(0, previewLimit);
+function resourceGroup(title, items, key, limit) {
+  const preview = items.slice(0, limit);
   const remaining = items.length - preview.length;
   return `<div class="content-group"><h2>${title}${stressMode ? " · 压力测试" : ""}</h2>${resourceList(preview)}${remaining > 0 ? `<button class="group-more" data-collection="${key}">查看全部 <span>${items.length}</span>${icon("arrow")}</button>` : ""}</div>`;
 }
@@ -73,6 +72,9 @@ function socialLink(item) {
 function render() {
   const sites = stressMode ? [...(config.sites || []), ...stressItems("站点")] : config.sites;
   const projects = stressMode ? [...(config.projects || []), ...stressItems("项目")] : config.projects;
+  // 两组都超量或窄屏时降低概览预算，避免概览与页脚互相挤压。
+  const isNarrow = window.matchMedia("(max-width: 720px)").matches;
+  const previewLimit = isNarrow || (sites.length > 4 && projects.length > 4) ? 3 : 4;
   renderedCollections = { sites: sites || [], projects: projects || [] };
   const compliance = [config.compliance?.icp, config.compliance?.publicSecurity].filter((item) => item?.label);
   const complianceHtml = compliance.length ? `<div class="compliance">${compliance.map((item, index) => `<a href="${item.url}" target="_blank" rel="noreferrer">${index === 1 ? icon("shield") : ""}${safe(item.label)}</a>`).join("")}</div>` : "";
@@ -95,8 +97,8 @@ function render() {
         </section>
         <section class="content" aria-label="站点与项目">
           <div id="content-overview" class="content-view content-overview">
-            ${sites?.length ? resourceGroup("站点", sites, "sites") : ""}
-            ${projects?.length ? resourceGroup("项目", projects, "projects") : ""}
+            ${sites?.length ? resourceGroup("站点", sites, "sites", previewLimit) : ""}
+            ${projects?.length ? resourceGroup("项目", projects, "projects", previewLimit) : ""}
           </div>
           <div id="content-detail" class="content-view content-detail" aria-hidden="true">
             <div class="detail-heading"><button id="collection-back" class="collection-back">${icon("back")}<span>返回</span></button><h2 id="collection-title"></h2></div>
