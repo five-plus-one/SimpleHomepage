@@ -72,9 +72,11 @@ function socialLink(item) {
 function render() {
   const sites = stressMode ? [...(config.sites || []), ...stressItems("站点")] : (config.sites || []);
   const projects = stressMode ? [...(config.projects || []), ...stressItems("项目")] : (config.projects || []);
-  // 两组都超量或窄屏时降低概览预算，避免概览与页脚互相挤压。
+  // 超量分组使用更小的概览预算，避免任意视口比例下与页脚互相挤压。
   const isNarrow = window.matchMedia("(max-width: 720px)").matches;
-  const previewLimit = isNarrow || (sites.length > 4 && projects.length > 4) ? 3 : 4;
+  const previewLimitFor = (items) => items.length > 4 ? 2 : (isNarrow ? 3 : 4);
+  const sitesPreviewLimit = previewLimitFor(sites);
+  const projectsPreviewLimit = previewLimitFor(projects);
   renderedCollections = { sites: sites || [], projects: projects || [] };
   const compliance = [config.compliance?.icp, config.compliance?.publicSecurity].filter((item) => item?.label);
   const complianceHtml = compliance.length ? `<div class="compliance">${compliance.map((item, index) => `<a href="${item.url}" target="_blank" rel="noreferrer">${index === 1 ? icon("shield") : ""}${safe(item.label)}</a>`).join("")}</div>` : "";
@@ -97,8 +99,8 @@ function render() {
         </section>
         <section class="content" aria-label="站点与项目">
           <div id="content-overview" class="content-view content-overview">
-            ${sites?.length ? resourceGroup("站点", sites, "sites", previewLimit) : ""}
-            ${projects?.length ? resourceGroup("项目", projects, "projects", previewLimit) : ""}
+            ${sites?.length ? resourceGroup("站点", sites, "sites", sitesPreviewLimit) : ""}
+            ${projects?.length ? resourceGroup("项目", projects, "projects", projectsPreviewLimit) : ""}
           </div>
           <div id="content-detail" class="content-view content-detail" aria-hidden="true">
             <div class="detail-heading"><button id="collection-back" class="collection-back">${icon("back")}<span>返回</span></button><h2 id="collection-title"></h2></div>
