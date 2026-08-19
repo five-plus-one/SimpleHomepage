@@ -1,6 +1,7 @@
 import { siteConfig as config } from "./site.config.js";
 
 const icons = {
+  back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5-7 7 7 7M8 12h9"/></svg>',
   arrow: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M8 5h11v11"/></svg>',
   sun: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>',
   moon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.2A8.5 8.5 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z"/></svg>',
@@ -87,17 +88,17 @@ function render() {
           <section class="social-section"><p>联系</p><div class="social-wrap"><nav class="socials" aria-label="社交账号">${config.socials.map(socialLink).join("")}</nav><button id="more-button" class="more-button" aria-expanded="false" hidden>更多 <span></span></button><div id="more-popover" class="more-popover" aria-hidden="true"></div></div></section>
         </section>
         <section class="content" aria-label="站点与项目">
-          ${sites?.length ? resourceGroup("站点", sites, "sites") : ""}
-          ${projects?.length ? resourceGroup("项目", projects, "projects") : ""}
+          <div id="content-overview" class="content-view content-overview">
+            ${sites?.length ? resourceGroup("站点", sites, "sites") : ""}
+            ${projects?.length ? resourceGroup("项目", projects, "projects") : ""}
+          </div>
+          <div id="content-detail" class="content-view content-detail" aria-hidden="true">
+            <div class="detail-heading"><button id="collection-back" class="collection-back">${icon("back")}<span>返回</span></button><h2 id="collection-title"></h2></div>
+            <div id="collection-list" class="collection-list"></div>
+          </div>
         </section>
       </div>
       <footer><div class="footer-bottom">${complianceHtml}<span class="footer-meta">${poweredBy}© ${new Date().getFullYear()} ${safe(config.profile.name)}</span></div></footer>
-      <section id="collection-panel" class="collection-panel" aria-hidden="true">
-        <div class="collection-card" role="dialog" aria-modal="true" aria-labelledby="collection-title">
-          <div class="collection-heading"><h2 id="collection-title"></h2><button id="collection-close" class="icon-button" aria-label="关闭">×</button></div>
-          <div id="collection-list" class="collection-list"></div>
-        </div>
-      </section>
     </section>`;
 }
 
@@ -190,24 +191,28 @@ function setupSocialOverflow() {
 }
 setupSocialOverflow();
 function setupCollectionPanel() {
-  const panel = document.querySelector("#collection-panel");
+  const content = document.querySelector(".content");
+  const overview = document.querySelector("#content-overview");
+  const detail = document.querySelector("#content-detail");
   const title = document.querySelector("#collection-title");
   const list = document.querySelector("#collection-list");
-  const closeButton = document.querySelector("#collection-close");
+  const backButton = document.querySelector("#collection-back");
   const close = () => {
-    panel.classList.remove("is-open");
-    panel.setAttribute("aria-hidden", "true");
+    content.classList.remove("is-detail");
+    overview.setAttribute("aria-hidden", "false");
+    detail.setAttribute("aria-hidden", "true");
   };
   document.querySelectorAll("[data-collection]").forEach((button) => button.addEventListener("click", () => {
     const key = button.dataset.collection;
     title.textContent = key === "sites" ? "全部站点" : "全部项目";
     list.innerHTML = resourceList(renderedCollections[key]);
-    panel.classList.add("is-open");
-    panel.setAttribute("aria-hidden", "false");
-    closeButton.focus();
+    list.scrollTop = 0;
+    content.classList.add("is-detail");
+    overview.setAttribute("aria-hidden", "true");
+    detail.setAttribute("aria-hidden", "false");
+    backButton.focus();
   }));
-  closeButton.addEventListener("click", close);
-  panel.addEventListener("click", (event) => { if (event.target === panel) close(); });
+  backButton.addEventListener("click", close);
   document.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
 }
 setupCollectionPanel();
