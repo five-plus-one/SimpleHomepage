@@ -128,7 +128,7 @@ seo: {
 
 ### 图标
 
-内置图标名称包括：`github`、`wechat`、`qq`、`mail`、`screen`、`link`、`blocks`、`paper`、`archive`、`spark`、`people`、`cube`。
+内置图标名称包括：`github`、`wechat`、`qq`、`mail`、`screen`、`link`、`blocks`、`paper`、`archive`、`spark`、`people`、`cube`、`shield`、`pulse`（服务状态）、`server`、`cloud`、`database`、`terminal`、`code`、`chart`、`globe`、`wifi`、`play`（视频）、`music`、`image`（图片/相册）、`book`（文档）、`chat`（聊天/留言）、`search`、`download`、`pen`（写作）、`calendar`、`clock`、`folder`、`gamepad`（游戏）、`bulb`(想法)、`star`、`heart`。
 
 需要更多平台时，可以提供单色 SVG 路径：
 

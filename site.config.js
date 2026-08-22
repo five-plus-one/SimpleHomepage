@@ -38,6 +38,7 @@ export const siteConfig = {
     { label: "五加一的网盘", description: "资源分享", url: "https://pan.five-plus-one.com", icon: "archive" },
     { label: "南通中学 2215", description: "班级站点", url: "https://ntzx2215.five-plus-one.com", icon: "people" },
     { label: "5PLUS1 SERVER", description: "Minecraft 服务器", url: "https://mc.five-plus-one.com", icon: "cube" },
+    { label: "服务状态", description: "五加一服务状态查询", url: "https://r-l.ink/status", icon: "pulse" },
   ],
   projects: [
     { label: "AI-Marker-Suite", description: "AI 阅卷自动批改助手", url: "https://aimarking.five-plus-one.com/", icon: "spark" },
